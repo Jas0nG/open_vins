@@ -89,6 +89,18 @@ public:
                         const Eigen::VectorXd &res, const Eigen::MatrixXd &R);
 
   /**
+   * @brief Performs EKF update for SchurVINS
+   * 
+   * @param state Pointer to state
+   * @param H_order Variable ordering used in the compressed Jacobian
+   * @param H Condensed Jacobian of updating measurement
+   * @param res Residual of updating measurement
+   * @param R Updating measurement covariance
+   */
+  static void SV_EKFUpdate(std::shared_ptr<State> state, const std::vector<std::shared_ptr<ov_type::Type>> &H_order,
+                           const Eigen::MatrixXd &H, const Eigen::VectorXd &res, const Eigen::MatrixXd &R);
+
+  /**
    * @brief This will set the initial covaraince of the specified state elements.
    * Will also ensure that proper cross-covariances are inserted.
    * @param state Pointer to state

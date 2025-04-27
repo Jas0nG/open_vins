@@ -1,3 +1,19 @@
+# ov_SchurVINS
+
+This repository implemented a SchurVINS algorithm based on the original OpenVINS codebase. The SchurVINS algorithm is a state-of-the-art visual-inertial odometry (VIO) system that utilizes the Schur complement to efficiently estimate the state of a robot in motion. This implementation is designed to be modular and extensible, allowing for easy integration with other systems and algorithms.
+
+Note that there's some limiations when apply SchurVINS update mode:
+1. the 3D Landmark has to be represented as GLOBAL 3D.  
+2. all online calibrations are not supported yet.  
+3. cause OpenVINS will call update when features lost in track, so the EKF-based Landmark Solver is not implemented in this codebase.
+
+## Acknowledgements  
+
+This project is inspired by the [SchurVINS](https://github.com/bytedance/SchurVINS). Special thanks to the original authors ( especially @frank-fyf ) for their innovative ideas and contributions to the open-source community!
+
+
+---
+
 # OpenVINS
 
 [![ROS 1 Workflow](https://github.com/rpng/open_vins/actions/workflows/build_ros1.yml/badge.svg)](https://github.com/rpng/open_vins/actions/workflows/build_ros1.yml)

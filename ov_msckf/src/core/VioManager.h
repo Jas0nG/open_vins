@@ -200,6 +200,9 @@ protected:
   /// Our MSCKF feature updater
   std::shared_ptr<UpdaterMSCKF> updaterMSCKF;
 
+  // SchurVINS updater
+  std::shared_ptr<UpdaterSchurVINS> updaterSchurVINS;
+
   /// Our SLAM/ARUCO feature updater
   std::shared_ptr<UpdaterSLAM> updaterSLAM;
 

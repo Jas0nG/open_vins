@@ -59,6 +59,12 @@ public:
     /// UV coordinates that this feature has been seen from (mapped by camera ID)
     std::unordered_map<size_t, std::vector<Eigen::VectorXf>> uvs;
 
+    // Jx^TJf
+    std::unordered_map<size_t, std::vector<Eigen::Matrix<double, 6, 3>>> W;
+
+    // for multi-cam
+    std::map<int, Eigen::Matrix<double, 6, 3>> stack_W_map;
+
     // UV normalized coordinates that this feature has been seen from (mapped by camera ID)
     std::unordered_map<size_t, std::vector<Eigen::VectorXf>> uvs_norm;
 

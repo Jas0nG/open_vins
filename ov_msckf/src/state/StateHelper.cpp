@@ -99,7 +99,7 @@ void StateHelper::EKFPropagation(std::shared_ptr<State> state, const std::vector
   state->_Cov.block(0, start_id, total_size, phi_size) = Cov_PhiT;
   state->_Cov.block(start_id, start_id, phi_size, phi_size) = Phi_Cov_PhiT;
 
-  // We should check if we are not positive semi-definitate (i.e. negative diagionals is not s.p.d)
+  // We should check if we are not positive semi-definite (i.e. negative diagonals is not s.p.d)
   Eigen::VectorXd diags = state->_Cov.diagonal();
   bool found_neg = false;
   for (int i = 0; i < diags.rows(); i++) {
@@ -193,6 +193,68 @@ void StateHelper::EKFUpdate(std::shared_ptr<State> state, const std::vector<std:
     for (auto const &calib : state->_cam_intrinsics) {
       state->_cam_intrinsics_cameras.at(calib.first)->set_value(calib.second->value());
     }
+  }
+}
+
+void StateHelper::SV_EKFUpdate(std::shared_ptr<State> state, const std::vector<std::shared_ptr<ov_type::Type>> &H_order,
+                               const Eigen::MatrixXd &H, const Eigen::VectorXd &res, const Eigen::MatrixXd &R) {
+  // Calculate the total state size
+  int state_size = state->_Cov.rows();
+
+  // cov follows the H_order and measurement
+  MXD SV_releated_cov = get_marginal_covariance(state, H_order);
+
+  // MXD S = H * SV_releated_cov * H.transpose() + R;
+  Eigen::MatrixXd S(R.rows(), R.rows());
+  S = H * SV_releated_cov * H.transpose();
+  S += R;
+
+  int current_it = 0;
+  std::vector<int> H_id;
+  for (const auto &meas_var : H_order) {
+    H_id.push_back(current_it);
+    current_it += meas_var->size();
+  }
+
+  // get releated cov between full state and measured releated states
+  Eigen::MatrixXd M_a = Eigen::MatrixXd::Zero(state->_Cov.rows(), res.rows());
+  for (const auto &var : state->_variables) {
+    // M_i = P·H^T，是每个状态变量所在cov中的行乘以H转置中每一列的累加得到的，在SchurVINS中H是对称的，所以这里可以省去转置。
+    Eigen::MatrixXd M_i = Eigen::MatrixXd::Zero(var->size(), res.rows());
+    for (size_t i = 0; i < H_order.size(); i++) {
+      std::shared_ptr<Type> meas_var = H_order[i];
+      M_i.noalias() += state->_Cov.block(var->id(), meas_var->id(), var->size(), meas_var->size()) *
+                       H.block(0, H_id[i], H.rows(), meas_var->size()).transpose(); // 原始方法是取列做转置
+    }
+    M_a.block(var->id(), 0, var->size(), res.rows()) = M_i;
+  }
+
+  Eigen::MatrixXd Sinv = Eigen::MatrixXd::Identity(R.rows(), R.rows());
+  S.selfadjointView<Eigen::Upper>().llt().solveInPlace(Sinv);
+  Eigen::MatrixXd K = M_a * Sinv.selfadjointView<Eigen::Upper>();
+
+  // Apply the update
+  Eigen::VectorXd dx = Eigen::VectorXd::Zero(state_size);
+  dx = K * res;
+
+  for (size_t i = 0; i < state->_variables.size(); i++) {
+    state->_variables.at(i)->update(dx.block(state->_variables.at(i)->id(), 0, state->_variables.at(i)->size(), 1));
+  }
+
+  state->_Cov.triangularView<Eigen::Upper>() -= K * M_a.transpose();
+  state->_Cov = state->_Cov.selfadjointView<Eigen::Upper>();
+
+  // We should check if we are not positive semi-definitate (i.e. negative diagionals is not s.p.d)
+  Eigen::VectorXd diags = state->_Cov.diagonal();
+  bool found_neg = false;
+  for (int i = 0; i < diags.rows(); i++) {
+    if (diags(i) < 0.0) {
+      PRINT_WARNING(RED "StateHelper::SV_EKFUpdate() - diagonal at %d is %.2f\n" RESET, i, diags(i));
+      found_neg = true;
+    }
+  }
+  if (found_neg) {
+    std::exit(EXIT_FAILURE);
   }
 }
 
