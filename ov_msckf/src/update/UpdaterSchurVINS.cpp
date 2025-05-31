@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- #include "UpdaterSchurVINS.hpp"
+ #include "UpdaterSchurVINS.h"
 
  #include "UpdaterHelper.h"
  
@@ -173,10 +173,10 @@
    size_t ct_meas = 0;
 
 
-   Matrix2o3d dr_dpc = Matrix2o3d::Zero();
-   Matrix3o6d dpc_dpos = Matrix3o6d::Zero();
-   Matrix2o6d jx = Matrix2o6d::Zero();
-   Matrix2o3d jf = Matrix2o3d::Zero();
+  Eigen::Matrix<double, 2, 3> dr_dpc = Eigen::Matrix<double, 2, 3>::Zero();
+  Eigen::Matrix<double, 3, 6> dpc_dpos = Eigen::Matrix<double, 3, 6>::Zero();
+  Eigen::Matrix<double, 2, 6> jx = Eigen::Matrix<double, 2, 6>::Zero();
+  Eigen::Matrix<double, 2, 3> jf = Eigen::Matrix<double, 2, 3>::Zero();
    Eigen::Vector2d r = Eigen::Vector2d::Zero();
  
    // 4. Compute linear system for each feature, nullspace project, and reject

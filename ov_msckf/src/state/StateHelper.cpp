@@ -202,7 +202,7 @@ void StateHelper::SV_EKFUpdate(std::shared_ptr<State> state, const std::vector<s
   int state_size = state->_Cov.rows();
 
   // cov follows the H_order and measurement
-  MXD SV_releated_cov = get_marginal_covariance(state, H_order);
+  Eigen::MatrixXd SV_releated_cov = get_marginal_covariance(state, H_order);
 
   // MXD S = H * SV_releated_cov * H.transpose() + R;
   Eigen::MatrixXd S(R.rows(), R.rows());
