@@ -40,7 +40,7 @@
 #include "state/State.h"
 #include "state/StateHelper.h"
 #include "update/UpdaterMSCKF.h"
-#include "update/UpdaterSchurVINS.hpp"
+#include "update/UpdaterSchurVINS.h"
 #include "update/UpdaterSLAM.h"
 #include "update/UpdaterZeroVelocity.h"
 
