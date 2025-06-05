@@ -62,6 +62,9 @@ public:
     // Jx^TJf
     std::unordered_map<size_t, std::vector<Eigen::Matrix<double, 6, 3>>> W;
 
+    // residuals
+    std::unordered_map<size_t, std::vector<Eigen::Vector2d>> res;
+
     // for multi-cam
     std::map<int, Eigen::Matrix<double, 6, 3>> stack_W_map;
 
@@ -91,6 +94,10 @@ public:
 
     /// Triangulated position of this feature, in the global frame first estimate
     Eigen::Vector3d p_FinG_fej;
+
+    Eigen::Matrix3d V; // Covariance of the feature in the global frame
+    Eigen::Matrix3d V_inv; // Inverse covariance of the feature in the global frame
+    Eigen::Vector3d gv; // Gradient of the feature in the global frame
   };
 
   /**

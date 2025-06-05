@@ -48,6 +48,7 @@ namespace ov_msckf {
 class State;
 class StateHelper;
 class UpdaterMSCKF;
+class UpdaterSchurVINS;
 class UpdaterSLAM;
 class UpdaterZeroVelocity;
 class Propagator;
